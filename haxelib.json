@@ -1,0 +1,17 @@
+{
+    "version": "0.0.0",
+    "contributors": [
+        "haxeui",
+        "ianharrigan"
+    ],
+    "license": "MIT",
+    "tags": [
+    ],
+    "classPath": "src",
+    "releasenote": "0.0.0",
+    "dependencies": {
+    },
+    "name": "haven",
+    "description": "",
+    "url": ""
+}

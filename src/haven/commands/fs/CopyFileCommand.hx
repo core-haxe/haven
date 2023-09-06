@@ -16,8 +16,7 @@ class CopyFileCommand extends Command {
         var finalSource = project.interpolatePath(source);
         var finalDestination = project.interpolatePath(destination);
         if (!FileSystem.exists(finalSource)) {
-            trace("ERROR: source file '" + finalSource + "' not found");
-            return;
+            throw "file not found: " + finalSource;
         }
 
         var desintationPath = new Path(finalDestination).dir;

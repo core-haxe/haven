@@ -23,35 +23,52 @@ class ProcessRunner {
             //args = [];
         }
 
-        var oldCwd = Sys.getCwd();
+        var oldCwd = null;
         if (cwd != null) {
+            oldCwd = Sys.getCwd();
             Sys.setCwd(cwd);
         }
 
         var p = new Process(command, args);
 
-        if (stdout) {
-            var outThread = Thread.create(printStreamThread);
-            outThread.sendMessage(p.stdout);
-        }
+        var outThread = Thread.create(printStreamThread);
+        outThread.sendMessage(p.stdout);
+        outThread.sendMessage(stdout);
 
-        if (stderr) {
-            var errThread = Thread.create(printStreamThread);
-            errThread.sendMessage(p.stderr);
-        }
+        var errThread = Thread.create(printStreamThread);
+        errThread.sendMessage(p.stderr);
+        errThread.sendMessage(stderr);
         
         exitCode = p.exitCode(true);
+
+        printStreamContent(p.stdout, stdout);
+        printStreamContent(p.stderr, stderr);
+
         p.close();
 
-        Sys.setCwd(oldCwd);
+        if (oldCwd != null) {
+            Sys.setCwd(oldCwd);
+        }
     }
 
     private function printStreamThread() {
         var stream:Input = Thread.readMessage(true);
+        var print:Bool = Thread.readMessage(true);
+        printStreamContent(stream, print);
+    }
+
+    private static function printStreamContent(stream:Input, print:Bool = true) {
         while (true) {
             try {
-                var line = stream.readLine();
-                Sys.println("     " + line);
+                var bytes = stream.readLine();
+                if (bytes.length == 0) {
+                    break;
+                }
+                if (print) {
+                    //Sys.stdout().write(bytes);
+                    Sys.println(bytes);
+                }
+                //Sys.print(bytes.toString());
             } catch (e:Eof) {
                 break;
             } catch (e:Dynamic) {

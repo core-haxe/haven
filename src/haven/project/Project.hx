@@ -154,7 +154,7 @@ class Project {
         for (moduleDoc in doc.children("module")) {
             var moduleHavenFile = Path.normalize(this.path + "/" + moduleDoc.text + "/haven.xml");
             if (!FileSystem.exists(moduleHavenFile)) {
-                trace("WARNING: haven file for module '" + moduleDoc.text + "' not found at '" + moduleHavenFile + "'");
+                throw "haven file for module '" + moduleDoc.text + "' not found at '" + moduleHavenFile + "'";
                 continue;
             }
             var moduleProjectFile = Project.fromFile(moduleHavenFile);

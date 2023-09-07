@@ -19,7 +19,9 @@ class Main {
         var commands = args.copy();
 
         Paths.appDir = Path.normalize(Sys.getCwd());
-        Paths.workingDir = Path.normalize(cwd);
+        if (cwd != null) {
+            Paths.workingDir = Path.normalize(cwd);
+        }
         Sys.println("\nstarting execution");
         Sys.println(" - app dir: " + Paths.appDir);
         Sys.println(" - working dir: " + Paths.workingDir);

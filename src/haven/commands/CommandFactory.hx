@@ -29,12 +29,18 @@ class CommandFactory {
         }
         _internalCommandsRegistered = true;
 
-        register("haxe", haven.commands.haxe.HaxeCommand.new);
+        register("cmd", haven.commands.general.CmdCommand.new);
 
         register("mkdir", haven.commands.fs.MkDirCommand.new);
         register("copy-file", haven.commands.fs.CopyFileCommand.new);
 
+        register("log", haven.commands.util.LogCommand.new);
+
+        register("haxe", haven.commands.haxe.HaxeCommand.new);
+
         register("npm", haven.commands.npm.NpmCommand.new);
+
+        register("pm2", haven.commands.pm2.Pm2Command.new);
     }
 }
 

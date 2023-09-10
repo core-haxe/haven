@@ -11,6 +11,7 @@ class Pm2Command extends Command {
     public var params:String;
     public var path:String;
     public var stdout:Bool = true;
+    public var ignoreExitCode:Bool;
     
     public override function exec(project:Project) {
         var finalPath = project.interpolatePath(path);
@@ -31,7 +32,9 @@ class Pm2Command extends Command {
         p.run(stdout);
 
         if (p.exitCode != 0) {
-            throw "problem executing pm2 (code: " + p.exitCode + ")";
+            if (!ignoreExitCode) {
+                throw "problem executing pm2 (code: " + p.exitCode + ")";
+            }
         }
     }
 
@@ -41,6 +44,9 @@ class Pm2Command extends Command {
         path = doc.attr("path");
         if (doc.attr("stdout") != null) {
             stdout = doc.attr("stdout") == "true";
+        }
+        if (doc.attr("ignoreExitCode") != null) {
+            ignoreExitCode = doc.attr("ignoreExitCode") == "true";
         }
     }
 }

@@ -19,9 +19,9 @@ class CopyFileCommand extends Command {
             throw "file not found: " + finalSource;
         }
 
-        var desintationPath = new Path(finalDestination).dir;
-        if (desintationPath != null && desintationPath.trim().length > 0 && !FileSystem.exists(desintationPath)) {
-            FileSystem.createDirectory(desintationPath);
+        var destinationPath = new Path(finalDestination).dir;
+        if (destinationPath != null && destinationPath.trim().length > 0 && !FileSystem.exists(destinationPath)) {
+            FileSystem.createDirectory(destinationPath);
         }
 
         Sys.println(" - copying file " + finalSource.replace(project.rootDir, "") + " => " + finalDestination.replace(project.rootDir, ""));

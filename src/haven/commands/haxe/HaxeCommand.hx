@@ -76,7 +76,7 @@ class HaxeCommand extends Command {
 
 
         var filename = hxmlFullPath(project);
-        Sys.println(" - extecuting haxe (" + hxmlFilename() + ")");
+        Sys.println(" - executing haxe (" + hxmlFilename() + ")");
         File.saveContent(filename, sb.toString());
 
         var p = new ProcessRunner("haxe", [hxmlFilename()], project.path);

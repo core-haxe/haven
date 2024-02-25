@@ -1,5 +1,6 @@
 package haven.project;
 
+import haven.properties.PropertyResolverFactory;
 import sys.FileSystem;
 import haxe.io.Path;
 import haven.util.XmlDocument;
@@ -133,6 +134,13 @@ class Project {
         return Path.normalize(parts.join("/"));
     }
 
+    public function relativePath(path:String, base:String = null):String {
+        if (base == null) {
+            base = rootDir;
+        }
+        return PathTools.relativeTo(new Path(path), new Path(base)).toString();
+    }
+
     private function parse(xml:Xml) {
         var doc = new XmlDocument(xml);
         group = doc.childText("group");
@@ -219,6 +227,16 @@ class Project {
         }
         if (name == "baseDir") {
             return this.path;
+        }
+
+        if (name.indexOf(":") != -1) {
+            var n = name.indexOf(":");
+            var prefix = name.substring(0, n);
+            var resolver = PropertyResolverFactory.getResolver(prefix);
+            if (resolver == null) {
+                throw 'could not find property resolver for "${prefix}"';
+            }
+            return resolver.resolve(name.substring(n + 1));
         }
 
         if (properties.has(name)) {

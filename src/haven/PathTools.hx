@@ -6,11 +6,9 @@ using StringTools;
 
 class PathTools {
     public static function relativeTo(path:Path, base:Path):Path {
-        trace(path.toString());
-        trace(base.toString());
         if (!path.toString().startsWith(base.toString())) {
             return path;
         }
-        return null;
+        return new Path(path.toString().replace(base.toString(), ""));
     }   
 }

@@ -1,5 +1,3 @@
 --neko run.n
 --main haven.Main
 --class-path src
-
---cmd haxelib run haven

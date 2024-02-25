@@ -9,16 +9,21 @@ class ProcessRunner {
     public var command:String;
     public var args:Array<String>;
     public var cwd:String;
+    public var indent:String = "";
 
     public var exitCode:Null<Int>;
 
-    public function new(command:String, args:Array<String> = null, cwd:String = null) {
+    public var result:String;
+    public var error:String;
+
+    public function new(command:String, args:Array<String> = null, cwd:String = null, indent:String = "") {
         this.command = command;
         this.args = args;    
         this.cwd = cwd;
+        this.indent = indent;
     }
 
-    public function run(stdout:Bool = true, stderr:Bool = true) {
+    public function run(stdout:Bool = true, stderr:Bool = true):String {
         if (args == null) {
             //args = [];
         }
@@ -31,33 +36,50 @@ class ProcessRunner {
 
         var p = new Process(command, args);
 
+        var stdoutBuffer = new StringBuf();
         var outThread = Thread.create(printStreamThread);
         outThread.sendMessage(p.stdout);
         outThread.sendMessage(stdout);
+        outThread.sendMessage(indent);
+        outThread.sendMessage(stdoutBuffer);
 
+        var stderrBuffer = new StringBuf();
         var errThread = Thread.create(printStreamThread);
         errThread.sendMessage(p.stderr);
         errThread.sendMessage(stderr);
+        errThread.sendMessage(indent);
+        errThread.sendMessage(stderrBuffer);
         
         exitCode = p.exitCode(true);
 
-        printStreamContent(p.stdout, stdout);
-        printStreamContent(p.stderr, stderr);
+        printStreamContent(p.stdout, stdout, indent, stdoutBuffer);
+        printStreamContent(p.stderr, stderr, indent, stderrBuffer);
 
         p.close();
+
+        result = stdoutBuffer.toString();
 
         if (oldCwd != null) {
             Sys.setCwd(oldCwd);
         }
+
+        if (exitCode != 0) {
+            error = stderrBuffer.toString();
+            throw error;
+        }
+
+        return result;
     }
 
     private function printStreamThread() {
         var stream:Input = Thread.readMessage(true);
         var print:Bool = Thread.readMessage(true);
-        printStreamContent(stream, print);
+        var indent:String = Thread.readMessage(true);
+        var result:StringBuf = Thread.readMessage(true);
+        printStreamContent(stream, print, indent, result);
     }
 
-    private static function printStreamContent(stream:Input, print:Bool = true) {
+    private static function printStreamContent(stream:Input, print:Bool = true, indent:String = "", result:StringBuf = null) {
         while (true) {
             try {
                 var bytes = stream.readLine();
@@ -66,7 +88,11 @@ class ProcessRunner {
                 }
                 if (print) {
                     //Sys.stdout().write(bytes);
-                    Sys.println(bytes);
+                    Sys.println(indent + bytes);
+                }
+                if (result != null) {
+                    result.add(bytes);
+                    result.add("\n");
                 }
                 //Sys.print(bytes.toString());
             } catch (e:Eof) {

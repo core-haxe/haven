@@ -37,10 +37,13 @@ class CommandFactory {
         register("log", haven.commands.util.LogCommand.new);
 
         register("haxe", haven.commands.haxe.HaxeCommand.new);
+        register("haxelib", haven.commands.haxelib.HaxelibCommand.new);
 
         register("npm", haven.commands.npm.NpmCommand.new);
 
         register("pm2", haven.commands.pm2.Pm2Command.new);
+
+        register("structure", haven.commands.structure.StructureCommand.new);
     }
 }
 

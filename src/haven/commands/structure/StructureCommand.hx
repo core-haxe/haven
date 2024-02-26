@@ -1,10 +1,13 @@
 package haven.commands.structure;
 
+import haxe.Http;
 import haxe.io.Path;
 import sys.io.File;
 import sys.FileSystem;
 import haven.util.XmlDocument;
 import haven.project.Project;
+
+using StringTools;
 
 class StructureCommand extends Command {
     private var root:String;
@@ -27,8 +30,15 @@ class StructureCommand extends Command {
         if (source != null) {
             var finalSource = project.interpolatePath(source);
             Sys.println(" using source file " + finalSource + "");
-            var contents = File.getContent(finalSource);
-            sourceDocument = new XmlDocument(Xml.parse(contents)).child("structure");
+            if (finalSource.startsWith("http")) {
+                // relies on sys http being sync and also will not follow redirects, fine (for now)
+                var http = new Http(finalSource);
+                http.request();
+                sourceDocument = new XmlDocument(Xml.parse(http.responseData)).child("structure");
+            } else {
+                var contents = File.getContent(finalSource);
+                sourceDocument = new XmlDocument(Xml.parse(contents)).child("structure");
+            }
         }
 
         if (sourceDocument == null) {

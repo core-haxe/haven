@@ -40,7 +40,7 @@ class GitSubmodule extends StructureType {
                 relativePath += "/";
             }
 
-            var gitSubmoduleUpdate = new ProcessRunner("git", ["submodule", "update", "--remote", relativePath], null, indent + "   ");
+            var gitSubmoduleUpdate = new ProcessRunner("git", ["submodule", "update", "--remote", "--init", relativePath], null, indent + "   ");
             gitSubmoduleUpdate.run();
         }
 

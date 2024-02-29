@@ -10,6 +10,7 @@ class ProcessRunner {
     public var args:Array<String>;
     public var cwd:String;
     public var indent:String = "";
+    public var ignoreExitCode:Bool = false;
 
     public var exitCode:Null<Int>;
 
@@ -63,7 +64,7 @@ class ProcessRunner {
             Sys.setCwd(oldCwd);
         }
 
-        if (exitCode != 0) {
+        if (!ignoreExitCode && exitCode != 0) {
             error = stderrBuffer.toString();
             throw error;
         }

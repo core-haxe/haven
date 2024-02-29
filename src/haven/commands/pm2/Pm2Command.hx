@@ -29,6 +29,7 @@ class Pm2Command extends Command {
         }
         //cmd += " --no-color";
         var p = new ProcessRunner(cmd, null, finalPath);
+        p.ignoreExitCode = ignoreExitCode;
         p.run(stdout);
 
         if (p.exitCode != 0) {

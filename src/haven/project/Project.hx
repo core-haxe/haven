@@ -86,7 +86,7 @@ class Project {
         return found;
     }
 
-    public function exec(commands:Array<String>, modulesToExecute:Array<Project> = null) {
+    public function exec(commands:Array<String>, modulesToExecute:Array<Project>, flags:Array<String>) {
         if (modulesToExecute.length == 0) {
             modulesToExecute = null;
         }
@@ -105,7 +105,7 @@ class Project {
 
         var failed = false;
         for (command in finalCommands) {
-            if (!execCommand(command, modulesToExecute)) {
+            if (!execCommand(command, modulesToExecute, flags)) {
                 failed = true;
                 break;
             }
@@ -118,7 +118,7 @@ class Project {
         }
     }
 
-    public function execCommand(command:String, modulesToExecute:Array<Project> = null) {
+    public function execCommand(command:String, modulesToExecute:Array<Project>, flags:Array<String>) {
         var use = true;
         if (modulesToExecute != null) {
             use = moduleListContainsProject(modulesToExecute, this);
@@ -140,7 +140,7 @@ class Project {
                 Sys.println(line);
                 Sys.println("--------------------------------------------------------------------------------");
                 try {
-                    commandDef.exec(this);
+                    commandDef.exec(this, flags);
                 } catch (e:Dynamic) {
                     Sys.println("     " + e);
                     return false;
@@ -151,7 +151,7 @@ class Project {
         for (module in modules) {
             var oldCwd = Sys.getCwd();
             Sys.setCwd(module.path);
-            if (!module.execCommand(command, modulesToExecute)) {
+            if (!module.execCommand(command, modulesToExecute, flags)) {
                 return false;
             }
             Sys.setCwd(oldCwd);

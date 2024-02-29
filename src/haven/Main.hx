@@ -5,6 +5,7 @@ import sys.FileSystem;
 import haxe.io.Path;
 
 using haven.ProjectTools;
+using StringTools;
 
 class Main {
 
@@ -17,6 +18,18 @@ class Main {
         }
 
         var commands = args.copy();
+        var flags = [];
+        var finalCommands = [];
+        for (c in commands) {
+            if (c.startsWith("--")) {
+                flags.push(c.substr(2));
+            } else {
+                finalCommands.push(c);
+            }
+        }
+
+        commands = finalCommands;
+
 
         Paths.appDir = Path.normalize(Sys.getCwd());
         if (cwd != null) {
@@ -63,7 +76,10 @@ class Main {
             Sys.setCwd(project.path);
 
             Sys.println(" - commands: " + commands.join(", "));
-            project.exec(commands, modulesToExecute);
+            if (flags.length > 0) {
+                Sys.println(" - flags: " + flags.join(", "));
+            }
+            project.exec(commands, modulesToExecute, flags);
         } catch (e:Dynamic) {
             Sys.println("");
             Sys.println(e);

@@ -28,10 +28,15 @@ class Main {
 
         var havenFile = Path.normalize(Paths.workingDir + "/haven.xml");
         if (!FileSystem.exists(havenFile)) {
-            trace("ERROR: haven file not found");
-            Sys.exit(1);
-            return;
+            havenFile = Path.normalize(Paths.workingDir + "/.haven/haven.xml");
+            if (!FileSystem.exists(havenFile)) {
+                Sys.println("");
+                Sys.println("ERROR: haven file not found");
+                Sys.exit(1);
+                return;
+            }
         }
+        Sys.println(" - haven file: " + havenFile);
 
         try {
             var rootHavenFile = findRootHaven(Paths.workingDir);
@@ -61,6 +66,9 @@ class Main {
             var testPath = Path.normalize(parts.join("/") + "/haven.xml");
             if (!FileSystem.exists(testPath)) {
                 s = Path.normalize(parts.join("/") + "/" + current + "/haven.xml");
+                if (!FileSystem.exists(s)) {
+                    s = Path.normalize(parts.join("/") + "/" + current + "/.haven/haven.xml");
+                }
                 break;
             }
         }

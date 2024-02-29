@@ -81,10 +81,12 @@ class Project {
             if (commandDef != null) {
                 Sys.println("");
                 Sys.println("--------------------------------------------------------------------------------");
-                var line = command + ": " + this.name + "";
+                var line = command + ": ";
+                var name = this.name;
                 if (this.group != null) {
-                    line += " (" + this.group + ")";
+                    name = this.group + "::" + name;
                 }
+                line += name;
                 Sys.println(line);
                 Sys.println("--------------------------------------------------------------------------------");
                 try {
@@ -330,7 +332,7 @@ class Project {
         var contents = File.getContent(path);
         var xml = Xml.parse(contents);
         var p = new Project();
-        p.filename = Path.normalize(path);
+        p.filename = Path.normalize(path.replace("/.haven", ""));
         p.parse(xml.firstElement());
         return p;
     }

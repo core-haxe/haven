@@ -1,5 +1,6 @@
 package haven;
 
+import haxe.CallStack;
 import haven.project.Project;
 import sys.FileSystem;
 import haxe.io.Path;
@@ -83,7 +84,29 @@ class Main {
         } catch (e:Dynamic) {
             Sys.println("");
             Sys.println(e);
+            printStack(CallStack.exceptionStack());
             Sys.println("\nexecution errored!\n");
+        }
+    }
+
+    private static function printStack(stack:Array<StackItem>) {
+        for (item in stack) {
+            switch (item) {
+                case FilePos(s, file, line, column):
+                    var sb = new StringBuf();
+                    sb.add("  ");
+                    sb.add(file);
+                    if (line != null) {
+                        sb.add(line);
+                    }
+                    if (column != null) {
+                        sb.add(":");
+                        sb.add(column);
+                    }
+                    Sys.println(sb.toString());
+                case _:
+                    trace(">>>>>>>>>>>>>>>>>>>>> UNKNOWN STACK ITEM", item);
+            }
         }
     }
 

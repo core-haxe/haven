@@ -45,9 +45,15 @@ class Main {
                 var root = Project.fromFile(rootHavenFile);
                 var module = Project.fromFile(havenFile);
                 var actualModule = root.findModule(module);
-                while (actualModule != null) {
-                    modulesToExecute.push(actualModule);
-                    actualModule = actualModule.parentProject;
+                var refModule = actualModule;
+                while (refModule != null) {
+                    modulesToExecute.push(refModule);
+                    refModule = refModule.parentProject;
+                }
+                for (module in actualModule.allModules) {
+                    if (!modulesToExecute.contains(module)) {
+                        modulesToExecute.push(module);
+                    }
                 }
                 havenFile = rootHavenFile;
             }

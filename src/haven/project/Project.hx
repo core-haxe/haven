@@ -54,10 +54,24 @@ class Project {
         return finalCommands;
     }
 
+    public var allModules(get, null):Array<Project>;
+    private function get_allModules():Array<Project> {
+        var list:Array<Project> = [];
+        for (m in modules) {
+            list.push(m);
+        }
+
+        for (m in modules) {
+            var childModules = m.allModules;
+            list = list.concat(childModules);
+        }
+        return list;
+    }
+
     public function findModule(module:Project):Project {
         var found:Project = null;
         for (m in modules) {
-            if (m.path == module.path) {
+            if (m.equals(module)) {
                 return m;
             }
         }
@@ -109,6 +123,7 @@ class Project {
         if (modulesToExecute != null) {
             use = moduleListContainsProject(modulesToExecute, this);
         }
+        //trace(command, this.path, use);
 
         if (use) {
             var commandDef = commands.get(command);
@@ -306,7 +321,7 @@ class Project {
     public function getPropertyAsPath(name:String) {
         var v = getProperty(name);
         if (v == null) {
-            return null;
+            throw 'could not resolve property "${name}"';
         }
         return Path.normalize(v);
     }
@@ -319,7 +334,7 @@ class Project {
             s = reg.map(s, f -> {
                 var p = getProperty(f.matched(1));
                 if (p == null) {
-                    p = "";
+                    throw 'could not resolve property "${f.matched(1)}"';
                 }
                 return p;
             });
@@ -338,7 +353,7 @@ class Project {
             s = reg.map(s, f -> {
                 var p = getProperty(f.matched(1));
                 if (p == null) {
-                    p = "";
+                    throw 'could not resolve property "${f.matched(1)}"';
                 }
                 return p;
             });

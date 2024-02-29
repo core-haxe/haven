@@ -7,7 +7,7 @@ import haven.util.XmlDocument;
 import haven.project.Project;
 
 class HaxelibDevType extends StructureType {
-    public override function execute(project:Project, node:XmlDocument, currentPath:String, indent:String) {
+    public override function execute(project:Project, node:XmlDocument, currentPath:String, basePath:String, indent:String) {
         var source = project.interpolate(node.attr("source"));
         var name = node.nodeName;
         if (source != null) {

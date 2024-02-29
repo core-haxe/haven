@@ -7,6 +7,6 @@ class StructureType {
     public function new() {
     }
 
-    public function execute(project:Project, node:XmlDocument, currentPath:String, indent:String) {
+    public function execute(project:Project, node:XmlDocument, currentPath:String, basePath:String, indent:String) {
     }
 }

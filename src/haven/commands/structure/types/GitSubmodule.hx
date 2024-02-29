@@ -10,19 +10,19 @@ import haven.project.Project;
 using StringTools;
 
 class GitSubmodule extends StructureType {
-    public override function execute(project:Project, node:XmlDocument, currentPath:String, indent:String) {
+    public override function execute(project:Project, node:XmlDocument, currentPath:String, basePath:String, indent:String) {
         var source = project.interpolate(node.attr("source"));
         var name = node.nodeName;
 
-        var cwd = Sys.getCwd();
+        var cwd = basePath;
         var hasGit = FileSystem.exists(Path.normalize(cwd + "/.git"));
         if (!hasGit) {
             var gitInit = new ProcessRunner("git", ["init"], null, indent + "   ");
             gitInit.run();
         }
 
-        if (!hasSubModule(name)) {
-            var relativePath = Path.normalize(project.relativePath(currentPath) + "/" + name);
+        if (!hasSubModule(name, cwd)) {
+            var relativePath = Path.normalize(project.relativePath(currentPath, basePath) + "/" + name);
             if (relativePath.startsWith("/")) {
                 relativePath = relativePath.substring(1);
             }
@@ -32,7 +32,7 @@ class GitSubmodule extends StructureType {
             var gitSubmoduleAdd = new ProcessRunner("git", ["submodule", "add", source, relativePath], null, indent + "   ");
             gitSubmoduleAdd.run();
         } else {
-            var relativePath = Path.normalize(project.relativePath(currentPath) + "/" + name);
+            var relativePath = Path.normalize(project.relativePath(currentPath, basePath) + "/" + name);
             if (relativePath.startsWith("/")) {
                 relativePath = relativePath.substring(1);
             }
@@ -46,8 +46,7 @@ class GitSubmodule extends StructureType {
 
     }
 
-    private function hasSubModule(name:String) {
-        var cwd = Sys.getCwd();
+    private function hasSubModule(name:String, cwd:String) {
         var filename = Path.normalize(cwd + "/.gitmodules");
         if (!FileSystem.exists(filename)) {
             return false;

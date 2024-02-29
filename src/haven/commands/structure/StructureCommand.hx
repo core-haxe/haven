@@ -21,6 +21,7 @@ class StructureCommand extends Command {
 
         structureTypes.set("haxelib-dev", haven.commands.structure.types.HaxelibDevType.new);
         structureTypes.set("git-submodule", haven.commands.structure.types.GitSubmodule.new);
+        structureTypes.set("git", haven.commands.structure.types.Git.new);
     }
 
     public override function exec(project:Project) {
@@ -46,11 +47,11 @@ class StructureCommand extends Command {
         }
 
         for (child in sourceDocument.children()) {
-            handleNode(project, child, finalRoot, " ");
+            handleNode(project, child, finalRoot, finalRoot, " ");
         }
     }
 
-    private function handleNode(project:Project, node:XmlDocument, currentPath:String, indent:String) {
+    private function handleNode(project:Project, node:XmlDocument, currentPath:String, basePath:String, indent:String) {
         var type = project.interpolate(node.attr("type"));
         var name = node.nodeName;
         if (type == null) { // no type indicates its a folder
@@ -72,18 +73,18 @@ class StructureCommand extends Command {
             Sys.println(indent + " " + project.relativePath(newPath, project.interpolatePath(currentPath)) + " [" + type + "]");
 
             var typeExecutor:StructureType = typeExecutorCtor();
-            typeExecutor.execute(project, node, currentPath, indent);
+            typeExecutor.execute(project, node, currentPath, basePath, indent);
         }
 
         for (child in node.children()) {
-            handleNode(project, child, currentPath, indent + " ");
+            handleNode(project, child, currentPath, basePath, indent + " ");
         }
     }
 
     public override function parse(doc:XmlDocument) {
         root = doc.attr("root");
         if (root == null) {
-            root = "${rootDir}";
+            root = "${baseDir}";
         }
         source = doc.attr("source");
         sourceDocument = doc;

@@ -42,10 +42,17 @@ class Main {
             var rootHavenFile = findRootHaven(Paths.workingDir);
             var modulesToExecute = [];
             if (rootHavenFile != null && rootHavenFile != havenFile) {
-                modulesToExecute.push(Project.fromFile(havenFile));
+                var root = Project.fromFile(rootHavenFile);
+                var module = Project.fromFile(havenFile);
+                var actualModule = root.findModule(module);
+                while (actualModule != null) {
+                    modulesToExecute.push(actualModule);
+                    actualModule = actualModule.parentProject;
+                }
                 havenFile = rootHavenFile;
             }
             var project = Project.fromFile(havenFile);
+            Sys.println(" - root haven file: " + havenFile);
             //project.printStructure();
             Sys.setCwd(project.path);
 
@@ -63,11 +70,15 @@ class Main {
         var s = null;
         while (parts.length > 0) {
             var current = parts.pop();
-            var testPath = Path.normalize(parts.join("/") + "/haven.xml");
-            if (!FileSystem.exists(testPath)) {
-                s = Path.normalize(parts.join("/") + "/" + current + "/haven.xml");
-                if (!FileSystem.exists(s)) {
-                    s = Path.normalize(parts.join("/") + "/" + current + "/.haven/haven.xml");
+            var testPath1 = Path.normalize(parts.join("/") + "/haven.xml");
+            var testPath2 = Path.normalize(parts.join("/") + "/.haven/haven.xml");
+            if (!FileSystem.exists(testPath1) && !FileSystem.exists(testPath2)) {
+                var candidate1 = Path.normalize(parts.join("/") + "/" + current + "/haven.xml");
+                var candidate2 = Path.normalize(parts.join("/") + "/" + current + "/.haven/haven.xml");
+                if (FileSystem.exists(candidate1)) {
+                    s = candidate1;
+                } else if (FileSystem.exists(candidate2)) {
+                    s = candidate2;
                 }
                 break;
             }

@@ -28,10 +28,7 @@ class Project {
         
     }
 
-    public function exec(commands:Array<String>, modulesToExecute:Array<Project> = null) {
-        if (modulesToExecute.length == 0) {
-            modulesToExecute = null;
-        }
+    private function buildCommandList(commands:Array<String>):Array<String> {
         var finalCommands = [];
         for (c in commands) {
             if (chains.exists(c)) {
@@ -43,6 +40,43 @@ class Project {
                 finalCommands.push(c);
             }
         }
+
+        for (module in modules) {
+            var moduleFinalCommands = module.buildCommandList(commands);
+            for (command in moduleFinalCommands) {
+                if (!finalCommands.contains(command)) {
+                    finalCommands.push(command);
+                }
+            }
+        }
+
+
+        return finalCommands;
+    }
+
+    public function findModule(module:Project):Project {
+        var found:Project = null;
+        for (m in modules) {
+            if (m.path == module.path) {
+                return m;
+            }
+        }
+
+        for (m in modules) {
+            var t = m.findModule(module);
+            if (t != null) {
+                return t;
+            }
+        }
+
+        return found;
+    }
+
+    public function exec(commands:Array<String>, modulesToExecute:Array<Project> = null) {
+        if (modulesToExecute.length == 0) {
+            modulesToExecute = null;
+        }
+        var finalCommands = buildCommandList(commands);
 
         if (finalCommands == null || finalCommands.length == 0 && defaultChain != null) {
             for (c in defaultChain.commands) {
@@ -87,6 +121,7 @@ class Project {
                     name = this.group + "::" + name;
                 }
                 line += name;
+                line += " [" +  Path.normalize(Sys.getCwd()) + "]";
                 Sys.println(line);
                 Sys.println("--------------------------------------------------------------------------------");
                 try {
@@ -99,9 +134,12 @@ class Project {
         }
 
         for (module in modules) {
+            var oldCwd = Sys.getCwd();
+            Sys.setCwd(module.path);
             if (!module.execCommand(command, modulesToExecute)) {
                 return false;
             }
+            Sys.setCwd(oldCwd);
         }
         return true;
     }
@@ -138,7 +176,7 @@ class Project {
 
     public function relativePath(path:String, base:String = null):String {
         if (base == null) {
-            base = rootDir;
+            base = this.path;
         }
         return PathTools.relativeTo(new Path(path), new Path(base)).toString();
     }
@@ -229,6 +267,9 @@ class Project {
         }
         if (name == "baseDir") {
             return this.path;
+        }
+        if (name == "cwd" || name == "currentWorkingDir") {
+            return Path.normalize(Sys.getCwd());
         }
 
         if (name.indexOf(":") != -1) {

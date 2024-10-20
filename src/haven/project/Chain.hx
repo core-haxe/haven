@@ -5,6 +5,7 @@ import haven.util.XmlDocument;
 class Chain {
     public var id:String;
     public var isDefault:Bool = false;
+    public var skipModuleCheck:Bool = false;
 
     public var commands:Array<String> = [];
 
@@ -16,6 +17,9 @@ class Chain {
         id = doc.nodeName;
         if (doc.attr("default") != null) {
             isDefault = doc.attr("default") == "true";
+        }
+        if (doc.attr("skipModuleCheck") != null) {
+            skipModuleCheck = doc.attr("skipModuleCheck") == "true";
         }
 
         for (child in doc.children()) {

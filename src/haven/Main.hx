@@ -71,7 +71,24 @@ class Main {
                 }
                 havenFile = rootHavenFile;
             }
-            var project = Project.fromFile(havenFile);
+
+            // were going to temporarily load the project to see if any of the chains
+            // has a skipModuleCheck attribute, if found, we'll then NOT throw an 
+            // exception if modules cant be found - this is important for actions
+            // like creating entire source trees since the modules wont be there
+            // initially
+            var throwExceptionOnModuleNotFound = true;
+            var temp = Project.fromFile(havenFile, false);
+            for (command in commands) {
+                var chain = temp.chains.get(command);
+                if (chain != null) {
+                    if (chain.skipModuleCheck) {
+                        throwExceptionOnModuleNotFound = false;
+                    }
+                }
+            }
+
+            var project = Project.fromFile(havenFile, throwExceptionOnModuleNotFound);
             Sys.println(" - root haven file: " + havenFile);
             //project.printStructure();
             Sys.setCwd(project.path);

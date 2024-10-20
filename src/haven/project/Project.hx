@@ -123,7 +123,6 @@ class Project {
         if (modulesToExecute != null) {
             use = moduleListContainsProject(modulesToExecute, this);
         }
-        //trace(command, this.path, use);
 
         if (use) {
             var commandDef = commands.get(command);
@@ -196,19 +195,19 @@ class Project {
         return PathTools.relativeTo(new Path(path), new Path(base)).toString();
     }
 
-    private function parse(xml:Xml) {
+    private function parse(xml:Xml, throwExceptionOnModuleNotFound:Bool = true) {
         var doc = new XmlDocument(xml);
         group = doc.childText("group");
         name = doc.childText("name");
         version = doc.childText("version");
 
-        parseModules(doc.child("modules"));
+        parseModules(doc.child("modules"), throwExceptionOnModuleNotFound);
         parseCommands(doc.child("commands"));
         parseProperties(doc.child("properties"));
         parseChains(doc.child("chains"));
     }
 
-    private function parseModules(doc:XmlDocument) {
+    private function parseModules(doc:XmlDocument, throwExceptionOnModuleNotFound:Bool = true) {
         modules = [];
         if (doc == null) {
             return;
@@ -217,7 +216,9 @@ class Project {
         for (moduleDoc in doc.children("module")) {
             var moduleHavenFile = Path.normalize(this.path + "/" + moduleDoc.text + "/haven.xml");
             if (!FileSystem.exists(moduleHavenFile)) {
-                throw "haven file for module '" + moduleDoc.text + "' not found at '" + moduleHavenFile + "'";
+                if (throwExceptionOnModuleNotFound) {
+                    throw "haven file for module '" + moduleDoc.text + "' not found at '" + moduleHavenFile + "'";
+                }
                 continue;
             }
             var moduleProjectFile = Project.fromFile(moduleHavenFile);
@@ -384,12 +385,12 @@ class Project {
         return this.path == other.path;
     }
 
-    public static function fromFile(path:String):Project {
+    public static function fromFile(path:String, throwExceptionOnModuleNotFound:Bool = true):Project {
         var contents = File.getContent(path);
         var xml = Xml.parse(contents);
         var p = new Project();
         p.filename = Path.normalize(path.replace("/.haven", ""));
-        p.parse(xml.firstElement());
+        p.parse(xml.firstElement(), throwExceptionOnModuleNotFound);
         return p;
     }
 }

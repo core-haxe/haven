@@ -12,13 +12,13 @@ class Git extends StructureType {
         var name = node.nodeName;
         var branch = node.attr("branch");
         if (branch == null) {
-            branch = "master";
+            branch = "main";
         }
 
         var cwd = Path.normalize(currentPath + "/" + name);
         var hasGit = FileSystem.exists(Path.normalize(cwd + "/.git"));
         if (!hasGit) {
-            var gitClone = new ProcessRunner("git", ["clone", source], null, indent + "   ");
+            var gitClone = new ProcessRunner("git", ["clone", source], currentPath, indent + "   ");
             gitClone.run();
         } else {
             var gitPull = new ProcessRunner("git", ["pull", "origin", branch], cwd, indent + "   ");

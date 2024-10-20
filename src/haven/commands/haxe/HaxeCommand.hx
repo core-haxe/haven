@@ -21,6 +21,7 @@ class HaxeCommand extends Command {
     public var classItems:Array<HaxeClassItem> = [];
     public var macroItems:Array<HaxeMacroItem> = [];
     public var postBuildItems:Array<HaxePostBuildItem> = [];
+    public var resources:Array<HaxeResourceItem> = [];
 
     public override function exec(project:Project) {
         buildHxml(project);
@@ -75,14 +76,15 @@ class HaxeCommand extends Command {
 
         sb.add("\n");
 
-        sb.add("# compiler defines\n");
-        for (compilerDefine in compilerDefines) {
-            sb.add("-D ");
-            sb.add(project.interpolate(compilerDefine.define));
+        if (compilerDefines.length > 0) {
+            sb.add("# compiler defines\n");
+            for (compilerDefine in compilerDefines) {
+                sb.add("-D ");
+                sb.add(project.interpolate(compilerDefine.define));
+                sb.add("\n");
+            }
             sb.add("\n");
         }
-
-        sb.add("\n");
 
         if (main != null) {
             sb.add("--main ");
@@ -102,6 +104,15 @@ class HaxeCommand extends Command {
             sb.add("# post build\n");
             for (postBuildItem in postBuildItems) {
                 sb.add("--cmd " + project.interpolate(postBuildItem.command));
+                sb.add("\n");
+            }
+        }
+
+        if (resources.length > 0) {
+            sb.add("\n");
+            sb.add("# resources\n");
+            for (resource in resources) {
+                sb.add("--resource " + project.interpolate(resource.path) + "@" + project.interpolate(resource.alias));
                 sb.add("\n");
             }
         }
@@ -195,6 +206,14 @@ class HaxeCommand extends Command {
             for (commandDoc in postBuildDoc.children("command")) {
                 var postBuildItem = HaxePostBuildItem.fromXml(commandDoc);
                 postBuildItems.push(postBuildItem);
+            }
+        }
+
+        var resourcesDoc = doc.child("resources");
+        if (resourcesDoc != null) {
+            for (resourceDoc in resourcesDoc.children("resource")) {
+                var resourceItem = HaxeResourceItem.fromXml(resourceDoc);
+                resources.push(resourceItem);
             }
         }
     }
@@ -315,6 +334,28 @@ private class HaxePostBuildItem {
 
     public static function fromXml(doc:XmlDocument) {
         var c = new HaxePostBuildItem();
+        c.parse(doc);
+        return c;
+    }
+}
+
+private class HaxeResourceItem {
+    public var path:String;
+    public var alias:String;
+
+    public function new() {
+    }
+
+    private function parse(doc:XmlDocument) {
+        path = doc.attr("path");
+        alias = path;
+        if (doc.attr("alias") != null) {
+            alias = doc.attr("alias");
+        }
+    }
+
+    public static function fromXml(doc:XmlDocument) {
+        var c = new HaxeResourceItem();
         c.parse(doc);
         return c;
     }

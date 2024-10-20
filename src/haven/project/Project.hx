@@ -135,7 +135,9 @@ class Project {
                     name = this.group + "::" + name;
                 }
                 line += name;
-                line += " [" +  Path.normalize(Sys.getCwd()) + "]";
+                if (flags.contains("display-paths")) {
+                    line += " [" +  Path.normalize(Sys.getCwd()) + "]";
+                }
                 Sys.println(line);
                 Sys.println("--------------------------------------------------------------------------------");
                 try {

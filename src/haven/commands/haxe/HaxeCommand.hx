@@ -18,6 +18,9 @@ class HaxeCommand extends Command {
     public var classPaths:Array<HaxeClassPath> = [];
     public var compilerArgs:Array<HaxeCompilerArg> = [];
     public var compilerDefines:Array<HaxeCompilerDefine> = [];
+    public var classItems:Array<HaxeClassItem> = [];
+    public var macroItems:Array<HaxeMacroItem> = [];
+    public var postBuildItems:Array<HaxePostBuildItem> = [];
 
     public override function exec(project:Project) {
         buildHxml(project);
@@ -45,6 +48,24 @@ class HaxeCommand extends Command {
         }
 
         sb.add("\n");
+
+        if (classItems.length > 0) {
+            sb.add("# classes\n");
+            for (classItem in classItems) {
+                sb.add(project.interpolate(classItem.path));
+                sb.add("\n");
+            }
+            sb.add("\n");
+        }
+
+        if (macroItems.length > 0) {
+            sb.add("# macros\n");
+            for (macroItem in macroItems) {
+                sb.add("--macro " + project.interpolate(macroItem.macroData));
+                sb.add("\n");
+            }
+            sb.add("\n");
+        }
 
         sb.add("# compiler args\n");
         for (compilerArg in compilerArgs) {
@@ -74,6 +95,16 @@ class HaxeCommand extends Command {
         sb.add(" ");
         sb.add(project.interpolatePath(output));
 
+        sb.add("\n");
+
+        if (postBuildItems.length > 0) {
+            sb.add("\n");
+            sb.add("# post build\n");
+            for (postBuildItem in postBuildItems) {
+                sb.add("--cmd " + project.interpolate(postBuildItem.command));
+                sb.add("\n");
+            }
+        }
 
         var filename = hxmlFullPath(project);
         Sys.println(" - executing haxe (" + hxmlFilename() + ")");
@@ -140,6 +171,30 @@ class HaxeCommand extends Command {
             for (compilerDefineDoc in compilerDefinesDoc.children("compiler-define")) {
                 var compilerDefine = HaxeCompilerDefine.fromXml(compilerDefineDoc);
                 compilerDefines.push(compilerDefine);
+            }
+        }
+
+        var classesDoc = doc.child("classes");
+        if (classesDoc != null) {
+            for (classDoc in classesDoc.children("class")) {
+                var classItem = HaxeClassItem.fromXml(classDoc);
+                classItems.push(classItem);
+            }
+        }
+
+        var macrosDoc = doc.child("macros");
+        if (macrosDoc != null) {
+            for (macroDoc in macrosDoc.children("macro")) {
+                var macroItem = HaxeMacroItem.fromXml(macroDoc);
+                macroItems.push(macroItem);
+            }
+        }
+
+        var postBuildDoc = doc.child("post-build");
+        if (postBuildDoc != null) {
+            for (commandDoc in postBuildDoc.children("command")) {
+                var postBuildItem = HaxePostBuildItem.fromXml(commandDoc);
+                postBuildItems.push(postBuildItem);
             }
         }
     }
@@ -209,6 +264,57 @@ private class HaxeCompilerDefine {
 
     public static function fromXml(doc:XmlDocument) {
         var c = new HaxeCompilerDefine();
+        c.parse(doc);
+        return c;
+    }
+}
+
+private class HaxeClassItem {
+    public var path:String;
+
+    public function new() {
+    }
+
+    private function parse(doc:XmlDocument) {
+        path = doc.text;
+    }
+
+    public static function fromXml(doc:XmlDocument) {
+        var c = new HaxeClassItem();
+        c.parse(doc);
+        return c;
+    }
+}
+
+private class HaxeMacroItem {
+    public var macroData:String;
+
+    public function new() {
+    }
+
+    private function parse(doc:XmlDocument) {
+        macroData = doc.text;
+    }
+
+    public static function fromXml(doc:XmlDocument) {
+        var c = new HaxeMacroItem();
+        c.parse(doc);
+        return c;
+    }
+}
+
+private class HaxePostBuildItem {
+    public var command:String;
+
+    public function new() {
+    }
+
+    private function parse(doc:XmlDocument) {
+        command = doc.text;
+    }
+
+    public static function fromXml(doc:XmlDocument) {
+        var c = new HaxePostBuildItem();
         c.parse(doc);
         return c;
     }

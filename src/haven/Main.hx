@@ -141,8 +141,9 @@ class Main {
                     s = candidate1;
                 } else if (FileSystem.exists(candidate2)) {
                     s = candidate2;
+                    break;
                 }
-                break;
+                //break;
             }
         }
         return s;

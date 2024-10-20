@@ -36,9 +36,11 @@ class Main {
         if (cwd != null) {
             Paths.workingDir = Path.normalize(cwd);
         }
-        Sys.println("\nstarting execution");
-        Sys.println(" - app dir: " + Paths.appDir);
-        Sys.println(" - working dir: " + Paths.workingDir);
+        if (!flags.contains("dont-print-header")) {
+            Sys.println("\nstarting execution");
+            Sys.println(" - app dir: " + Paths.appDir);
+            Sys.println(" - working dir: " + Paths.workingDir);
+        }
 
         var havenFile = Path.normalize(Paths.workingDir + "/haven.xml");
         if (!FileSystem.exists(havenFile)) {
@@ -50,7 +52,9 @@ class Main {
                 return;
             }
         }
-        Sys.println(" - haven file: " + havenFile);
+        if (!flags.contains("dont-print-header")) {
+            Sys.println(" - haven file: " + havenFile);
+        }
 
         try {
             var rootHavenFile = findRootHaven(Paths.workingDir);
@@ -89,14 +93,19 @@ class Main {
             }
 
             var project = Project.fromFile(havenFile, throwExceptionOnModuleNotFound);
-            Sys.println(" - root haven file: " + havenFile);
+            if (!flags.contains("dont-print-header")) {
+                Sys.println(" - root haven file: " + havenFile);
+            }
             //project.printStructure();
             Sys.setCwd(project.path);
 
-            Sys.println(" - commands: " + commands.join(", "));
-            if (flags.length > 0) {
-                Sys.println(" - flags: " + flags.join(", "));
+            if (!flags.contains("dont-print-header")) {
+                Sys.println(" - commands: " + commands.join(", "));
+                if (flags.length > 0) {
+                    Sys.println(" - flags: " + flags.join(", "));
+                }
             }
+            
             project.exec(commands, modulesToExecute, flags);
         } catch (e:Dynamic) {
             Sys.println("");

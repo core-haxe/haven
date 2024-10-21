@@ -12,7 +12,7 @@ class PropertyResolverFactory {
 
         var ctor = resolvers.get(name);
         if (ctor == null) {
-            return null;
+            throw 'could not find property resolver for "${name}"';
         }
 
         return ctor();

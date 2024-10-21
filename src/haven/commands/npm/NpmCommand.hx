@@ -12,10 +12,13 @@ class NpmCommand extends Command {
 
     public override function exec(project:Project) {
         var finalPath = project.interpolatePath(path);
+        if (operation == null || operation == "") {
+            operation = "install";
+        }
 
         Sys.println(" - executing npm " + operation + displayPathRelativeToRoot(project, finalPath, " in "));
 
-        var p = new ProcessRunner("npm install --quiet", null, finalPath);
+        var p = new ProcessRunner("npm " + operation + " --quiet", null, finalPath);
         p.run(false);
 
         if (p.exitCode != 0) {

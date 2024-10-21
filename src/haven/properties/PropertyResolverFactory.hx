@@ -29,5 +29,6 @@ class PropertyResolverFactory {
         registerResolver("env", EnvironmentPropertyResolver.new);
         registerResolver("environment", EnvironmentPropertyResolver.new);
         registerResolver("haxelib", HaxelibPropertyResolver.new);
+        registerResolver("profile", ProfilePropertyResolver.new);
     }
 }

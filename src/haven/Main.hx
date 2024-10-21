@@ -96,6 +96,9 @@ class Main {
             if (!flags.contains("dont-print-header")) {
                 Sys.println(" - root haven file: " + havenFile);
             }
+            var rootHavenFileParts = rootHavenFile.split("/");
+            rootHavenFileParts.pop();
+            Paths.rootDir = Path.normalize(rootHavenFileParts.join("/"));
             //project.printStructure();
             Sys.setCwd(project.path);
 
@@ -105,7 +108,7 @@ class Main {
                     Sys.println(" - flags: " + flags.join(", "));
                 }
             }
-            
+
             project.exec(commands, modulesToExecute, flags);
         } catch (e:Dynamic) {
             Sys.println("");

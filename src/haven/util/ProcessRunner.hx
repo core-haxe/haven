@@ -52,10 +52,7 @@ class ProcessRunner {
         errThread.sendMessage(stderrBuffer);
         
         exitCode = p.exitCode(true);
-
-        printStreamContent(p.stdout, stdout, indent, stdoutBuffer);
-        printStreamContent(p.stderr, stderr, indent, stderrBuffer);
-
+        
         p.close();
 
         result = stdoutBuffer.toString();

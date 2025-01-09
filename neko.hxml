@@ -1,3 +1,4 @@
 --neko run.n
 --main haven.Main
+--library hscript
 --class-path src

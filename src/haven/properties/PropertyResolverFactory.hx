@@ -30,5 +30,8 @@ class PropertyResolverFactory {
         registerResolver("environment", EnvironmentPropertyResolver.new);
         registerResolver("haxelib", HaxelibPropertyResolver.new);
         registerResolver("profile", ProfilePropertyResolver.new);
+        #if hscript
+        registerResolver("script", ScriptPropertyResolver.new);
+        #end
     }
 }

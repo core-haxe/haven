@@ -44,6 +44,8 @@ class CommandFactory {
         register("pm2", haven.commands.pm2.Pm2Command.new);
 
         register("structure", haven.commands.structure.StructureCommand.new);
+
+        register("archive", haven.commands.archive.ArchiveCommand.new);
     }
 }
 

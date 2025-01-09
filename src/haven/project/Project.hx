@@ -241,6 +241,8 @@ class Project {
         }
     }
 
+    // static properties values are evaluated once and then the same value will be used over and over again
+    private static var staticPropertyValues:Map<String, String> = [];
     private function parseProperties(doc:XmlDocument) {
         properties = new Properties();
         if (doc == null) {
@@ -250,6 +252,13 @@ class Project {
         for (properyDoc in doc.children("property")) {
             var name = properyDoc.attr("name");
             var value = properyDoc.attr("value");
+            var isStatic = false;
+            if (properyDoc.attr("static") != null) {
+                isStatic = (properyDoc.attr("static").toLowerCase() == "true");
+            }
+            if (isStatic) {
+                staticPropertyValues.set(name, null);
+            }
             properties.add(name, value);
         }
     }
@@ -290,6 +299,10 @@ class Project {
             return Path.normalize(Sys.getCwd());
         }
 
+        if (staticPropertyValues.exists(name) && staticPropertyValues.get(name) != null) {
+            return staticPropertyValues.get(name);
+        }
+
         if (name.indexOf(":") != -1) {
             var n = name.indexOf(":");
             var prefix = name.substring(0, n);
@@ -297,7 +310,12 @@ class Project {
             if (resolver == null) {
                 throw 'could not find property resolver for "${prefix}"';
             }
-            return resolver.resolve(name.substring(n + 1));
+            name = name.substring(n + 1);
+            var v = resolver.resolve(name);
+            if (staticPropertyValues.exists(name)) {
+                staticPropertyValues.set(name, v);
+            }
+            return v;
         }
 
         if (properties.has(name)) {
@@ -316,6 +334,10 @@ class Project {
                     return p;
                 });
             }
+        }
+
+        if (staticPropertyValues.exists(name)) {
+            staticPropertyValues.set(name, v);
         }
 
         return v;

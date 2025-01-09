@@ -46,6 +46,8 @@ class CommandFactory {
         register("structure", haven.commands.structure.StructureCommand.new);
 
         register("archive", haven.commands.archive.ArchiveCommand.new);
+
+        register("git", haven.commands.git.GitCommand.new);
     }
 }
 

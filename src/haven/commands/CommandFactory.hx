@@ -52,6 +52,9 @@ class CommandFactory {
         register("xpath-set", haven.commands.xpath.XPathSetCommand.new);
 
         register("regexp-replace", haven.commands.regexp.RegExpReplaceCommand.new);
+
+        register("for-each-module", haven.commands.modules.ForEachModuleCommand.new);
+        register("with-each-module", haven.commands.modules.ForEachModuleCommand.new);
     }
 }
 

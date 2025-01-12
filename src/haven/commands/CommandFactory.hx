@@ -48,6 +48,10 @@ class CommandFactory {
         register("archive", haven.commands.archive.ArchiveCommand.new);
 
         register("git", haven.commands.git.GitCommand.new);
+
+        register("xpath-set", haven.commands.xpath.XPathSetCommand.new);
+
+        register("regexp-replace", haven.commands.regexp.RegExpReplaceCommand.new);
     }
 }
 

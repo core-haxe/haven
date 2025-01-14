@@ -30,6 +30,12 @@ class CommandFactory {
         _internalCommandsRegistered = true;
 
         register("cmd", haven.commands.general.CmdCommand.new);
+        register("set-env-var", haven.commands.general.SetEnvironmentVariableCommand.new);
+        register("set-environment-variable", haven.commands.general.SetEnvironmentVariableCommand.new);
+        register("set-var", haven.commands.general.SetVariableCommand.new);
+        register("set-variable", haven.commands.general.SetVariableCommand.new);
+        register("set-prop", haven.commands.general.SetVariableCommand.new);
+        register("set-property", haven.commands.general.SetVariableCommand.new);
 
         register("mkdir", haven.commands.fs.MkDirCommand.new);
         register("copy-file", haven.commands.fs.CopyFileCommand.new);

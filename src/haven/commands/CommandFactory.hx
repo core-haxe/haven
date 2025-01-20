@@ -39,6 +39,8 @@ class CommandFactory {
 
         register("mkdir", haven.commands.fs.MkDirCommand.new);
         register("copy-file", haven.commands.fs.CopyFileCommand.new);
+        register("del-file", haven.commands.fs.CopyFileCommand.new);
+        register("delete-file", haven.commands.fs.DeleteFileCommand.new);
 
         register("log", haven.commands.util.LogCommand.new);
 

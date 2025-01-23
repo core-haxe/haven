@@ -36,6 +36,7 @@ class CommandFactory {
         register("set-variable", haven.commands.general.SetVariableCommand.new);
         register("set-prop", haven.commands.general.SetVariableCommand.new);
         register("set-property", haven.commands.general.SetVariableCommand.new);
+        register("for-each", haven.commands.general.ForEachCommand.new);
 
         register("mkdir", haven.commands.fs.MkDirCommand.new);
         register("copy-file", haven.commands.fs.CopyFileCommand.new);
@@ -63,6 +64,9 @@ class CommandFactory {
 
         register("for-each-module", haven.commands.modules.ForEachModuleCommand.new);
         register("with-each-module", haven.commands.modules.ForEachModuleCommand.new);
+
+        register("json-path", haven.commands.json.JsonPathCommand.new);
+
     }
 }
 

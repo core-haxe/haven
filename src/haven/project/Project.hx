@@ -16,6 +16,10 @@ class Project {
     public var name:String;
     public var version:String;
 
+    public var isolated:Bool = false; // isolated means you want this project to run, somewhat in isolation
+                                      // full chains for all found modules, wont be run, but the module will
+                                      // have access to any parent project properties
+
     public var modules:Array<Project> = [];
     public var commands:Map<String, CommandDef> = [];
 
@@ -199,6 +203,9 @@ class Project {
 
     private function parse(xml:Xml, throwExceptionOnModuleNotFound:Bool = true) {
         var doc = new XmlDocument(xml);
+        if (xml.get("isolated") != null) {
+            isolated = (xml.get("isolated") == "true");
+        }
         group = doc.childText("group");
         name = doc.childText("name");
         version = doc.childText("version");

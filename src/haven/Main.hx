@@ -62,18 +62,23 @@ class Main {
             if (rootHavenFile != null && rootHavenFile != havenFile) {
                 var root = Project.fromFile(rootHavenFile);
                 var module = Project.fromFile(havenFile);
-                var actualModule = root.findModule(module);
-                var refModule = actualModule;
-                while (refModule != null) {
-                    modulesToExecute.push(refModule);
-                    refModule = refModule.parentProject;
-                }
-                for (module in actualModule.allModules) {
-                    if (!modulesToExecute.contains(module)) {
-                        modulesToExecute.push(module);
+                if (module.isolated) {
+                    rootHavenFile = havenFile;
+                    modulesToExecute = [module];
+                } else {
+                    var actualModule = root.findModule(module);
+                    var refModule = actualModule;
+                    while (refModule != null) {
+                        modulesToExecute.push(refModule);
+                        refModule = refModule.parentProject;
                     }
+                    for (module in actualModule.allModules) {
+                        if (!modulesToExecute.contains(module)) {
+                            modulesToExecute.push(module);
+                        }
+                    }
+                    havenFile = rootHavenFile;
                 }
-                havenFile = rootHavenFile;
             }
 
             // were going to temporarily load the project to see if any of the chains
@@ -107,6 +112,10 @@ class Main {
                 if (flags.length > 0) {
                     Sys.println(" - flags: " + flags.join(", "));
                 }
+            }
+
+            if (project.isolated) {
+                project.properties.merge(modulesToExecute[0].properties);
             }
 
             project.exec(commands, modulesToExecute, flags);

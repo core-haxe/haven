@@ -1,4 +1,6 @@
 --neko run.n
 --main haven.Main
 --library hscript
+--library jsonpath
+--library thx.core
 --class-path src

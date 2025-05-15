@@ -44,7 +44,6 @@ class CopyDirCommand extends Command {
                 var srcBytes = File.getBytes(srcFullPath);
                 File.saveBytes(dstFullPath, srcBytes);
             }
-
         }
     }
 

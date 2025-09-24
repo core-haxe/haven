@@ -11,11 +11,12 @@ using StringTools;
 class CopyFileCommand extends Command {
     public var source:String;
     public var destination:String;
+    public var mustExist:Bool = true;
 
     public override function exec(project:Project) {
         var finalSource = project.interpolatePath(source);
         var finalDestination = project.interpolatePath(destination);
-        if (!FileSystem.exists(finalSource)) {
+        if (mustExist && !FileSystem.exists(finalSource)) {
             throw "file not found: " + finalSource;
         }
 
@@ -33,5 +34,8 @@ class CopyFileCommand extends Command {
     public override function parse(doc:XmlDocument) {
         source = doc.attr("source");
         destination = doc.attr("destination");
+        if (doc.attr("mustExist") != null) {
+            mustExist = (doc.attr("mustExist") == "true");
+        }
     }
 }
